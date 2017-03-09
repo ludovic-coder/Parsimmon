@@ -10,11 +10,14 @@ We currently support Swift 3.0. If you are looking for Objective-C, please use v
 ## Toolkit
 
 Currently available tools:
-- Tokenizer
-- Tagger
-- Lemmatizer
-- Naive Bayes Classifier
-- Decision Tree (alpha)
+
+- [x] Tokenizer
+- [x] Tagger
+- [x] Lemmatizer
+- [x] Naive Bayes Classifier
+- [x] Decision Tree (alpha)
+- [ ] Handle languages specifications
+- [ ] Support Vector Machines
 
 
 ## Installation
