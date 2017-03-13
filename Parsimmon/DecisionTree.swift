@@ -31,7 +31,7 @@ public struct Datum {
         self.classification = classification
     }
     
-    public func featureValueAtPosition(position: Int) -> Int {
+    public func featureValueAtPosition(_ position: Int) -> Int {
         if position == 0 {
             return self.featureValues.0
         } else {
@@ -40,22 +40,22 @@ public struct Datum {
     }
 }
 
-public class Node<T> {
-    public var leftChild: Node<T>?
-    public var rightChild: Node<T>?
-    public var value: T
+open class Node<T> {
+    open var leftChild: Node<T>?
+    open var rightChild: Node<T>?
+    open var value: T
     
     init(value: T) {
         self.value = value
     }
 }
 
-public class DecisionTree {
-    public var root: Node<Int>?
-    public var maxDepth: Int = 5
-    private let featureNames: (String, String)
-    private let classificationNames: (String, String)
-    private var data = [Datum]()
+open class DecisionTree {
+    open var root: Node<Int>?
+    open var maxDepth: Int = 5
+    fileprivate let featureNames: (String, String)
+    fileprivate let classificationNames: (String, String)
+    fileprivate var data = [Datum]()
     
     public init(featureNames: (String, String), classificationNames: (String, String)) {
         self.featureNames = featureNames
@@ -67,19 +67,19 @@ public class DecisionTree {
 
         @param datum A data point
     */
-    public func addSample(datum: Datum) {
+    open func addSample(_ datum: Datum) {
         self.data.append(datum)
     }
 
     /**
         Builds the decision tree based on the data it has.
     */
-    public func build() {
-        let features = [ 0, 1 ]
-        self.root = self.decisionTree(data: self.data, remainingFeatures: features, maxDepth: self.maxDepth)
+    open func build() {
+        let features = [0, 1]
+        self.root = self.decisionTree(self.data, remainingFeatures: features, maxDepth: self.maxDepth)
     }
     
-    public func classify(sample: [Int]) -> String? {
+    open func classify(_ sample: [Int]) -> String? {
         var node = self.root
         while (node != nil) {
             let unwrappedNode = node!
@@ -99,7 +99,7 @@ public class DecisionTree {
         return nil
     }
     
-    private func decisionTree(data: [Datum], remainingFeatures: [Int], maxDepth: Int) -> Node<Int> {
+    fileprivate func decisionTree(_ data: [Datum], remainingFeatures: [Int], maxDepth: Int) -> Node<Int> {
         let tree = Node<Int>(value: 0)
         if data.first == nil {
             return tree
@@ -135,18 +135,18 @@ public class DecisionTree {
             var maxInformationGain = -Float.infinity
             var bestFeature = 0
             for feature in remainingFeatures {
-                let informationGain = self.informationGain(feature: feature, data: data)
+                let informationGain = self.informationGain(feature, data: data)
                 if informationGain >= maxInformationGain {
                     maxInformationGain = informationGain
                     bestFeature = feature
                 }
             }
-            let splitData = self.splitData(data: data, onFeature: bestFeature)
+            let splitData = self.splitData(data, onFeature: bestFeature)
             var newRemainingFeatures = remainingFeatures
             if let bestFeatureIndex = newRemainingFeatures.index(of: bestFeature) {
                 newRemainingFeatures.remove(at: bestFeatureIndex)
-                tree.leftChild = self.decisionTree(data: splitData.0, remainingFeatures: newRemainingFeatures, maxDepth: maxDepth - 1)
-                tree.rightChild = self.decisionTree(data: splitData.1, remainingFeatures: newRemainingFeatures, maxDepth: maxDepth - 1)
+                tree.leftChild = self.decisionTree(splitData.0, remainingFeatures: newRemainingFeatures, maxDepth: maxDepth - 1)
+                tree.rightChild = self.decisionTree(splitData.1, remainingFeatures: newRemainingFeatures, maxDepth: maxDepth - 1)
                 tree.value = bestFeature
             }
         }
@@ -154,11 +154,11 @@ public class DecisionTree {
         return tree
     }
     
-    private func splitData(data: [Datum], onFeature: Int) -> ([Datum], [Datum]) {
+    fileprivate func splitData(_ data: [Datum], onFeature: Int) -> ([Datum], [Datum]) {
         var first = [Datum]()
         var second = [Datum]()
         for datum in data {
-            if datum.featureValueAtPosition(position: onFeature) == 0 {
+            if datum.featureValueAtPosition(onFeature) == 0 {
                 first.append(datum)
             } else {
                 second.append(datum)
@@ -169,27 +169,27 @@ public class DecisionTree {
     
     // MARK: Entropy
     
-    private func informationGain(feature: Int, data: [Datum]) -> Float {
-        return self.HY(data: data) - self.HY(data: data, X: feature)
+    fileprivate func informationGain(_ feature: Int, data: [Datum]) -> Float {
+        return self.HY(data) - self.HY(data, X: feature)
     }
     
-    private func HY(data: [Datum]) -> Float {
-        let pY0: Float = self.pY(data: data, Y: 0)
+    fileprivate func HY(_ data: [Datum]) -> Float {
+        let pY0: Float = self.pY(data, Y: 0)
         let pY1 = 1.0 - pY0
         return -1.0 * (pY0 * log2(pY0) + pY1 * log2(pY1))
     }
     
-    private func HY(data: [Datum], X: Int) -> Float {
+    fileprivate func HY(_ data: [Datum], X: Int) -> Float {
         var result = Float(0.0)
         for x in [0, 1] {
             for y in [0, 1] {
-                result -= self.pX(data: data, X: x, Y: y, feature: X) * log2(self.pY(data: data, Y: y, X: x, feature: X))
+                result -= self.pX(data, X: x, Y: y, feature: X) * log2(self.pY(data, Y: y, X: x, feature: X))
             }
         }
         return result
     }
-
-    private func pY(data: [Datum], Y: Int) -> Float {
+    
+    fileprivate func pY(_ data: [Datum], Y: Int) -> Float {
         var count = 0
         for datum in data {
             if datum.classification == Y {
@@ -199,11 +199,11 @@ public class DecisionTree {
         return Float(count) / Float(data.count)
     }
     
-    private func pY(data: [Datum], Y: Int, X: Int, feature: Int) -> Float {
+    fileprivate func pY(_ data: [Datum], Y: Int, X: Int, feature: Int) -> Float {
         var yCount = 0
         var xCount = 0
         for datum in data {
-            if datum.featureValueAtPosition(position: feature) == X {
+            if datum.featureValueAtPosition(feature) == X {
                 xCount += 1
                 if datum.classification == Y {
                     yCount += 1
@@ -213,10 +213,10 @@ public class DecisionTree {
         return Float(yCount) / Float(xCount)
     }
     
-    private func pX(data: [Datum], X: Int, Y: Int, feature: Int) -> Float {
+    fileprivate func pX(_ data: [Datum], X: Int, Y: Int, feature: Int) -> Float {
         var count = 0
         for datum in data {
-            if datum.classification == Y && datum.featureValueAtPosition(position: feature) == X {
+            if datum.classification == Y && datum.featureValueAtPosition(feature) == X {
                 count += 1
             }
         }

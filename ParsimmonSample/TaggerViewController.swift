@@ -28,7 +28,7 @@ class TaggerViewController: UIViewController {
     @IBOutlet fileprivate weak var inputTextField: UITextField!
     @IBOutlet fileprivate weak var outputTextview: UITextView!
     
-    fileprivate lazy var tagger: Tagger = Tagger()
+    fileprivate lazy var tagger = Tagger()
     
     func dismissKeyboard() {
         view.endEditing(true)
@@ -36,7 +36,7 @@ class TaggerViewController: UIViewController {
 
     @IBAction fileprivate func parsimmonAction(_ sender: UIButton) {
         guard let text = inputTextField.text else { return }
-        let taggedTokens = tagger.tagWordsInText(text: text)
+        let taggedTokens = tagger.tagWordsInText(text)
         outputTextview.text = "\(taggedTokens)"
         dismissKeyboard()
     }

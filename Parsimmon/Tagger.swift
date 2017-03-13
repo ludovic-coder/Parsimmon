@@ -29,7 +29,11 @@ public struct Tagger: Analyzer {
         return NSLinguisticTagSchemeNameTypeOrLexicalClass
     }
 
-    public init(seed: Seed = Seed()) {
+    public init() {
+        self.seed = Seed()
+    }
+
+    public init(seed: Seed) {
         self.seed = seed
     }
 
@@ -40,8 +44,8 @@ public struct Tagger: Analyzer {
         @param options Linguistic tagger options
         @return The tagged tokens
     */
-    public func tagWordsInText(text: String, options: NSLinguisticTagger.Options? = nil) -> [TaggedToken] {
-        return analyze(analyzer: self, text: text, options: options).map { (token, tag) in
+    public func tagWordsInText(_ text: String, options: NSLinguisticTagger.Options? = nil) -> [TaggedToken] {
+        return analyze(self, text: text, options: options).map { (token, tag) in
             TaggedToken(token: token, tag: tag)
         }
     }

@@ -6,11 +6,11 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   Parsimmon:
-    :path: "."
+    :path: .
 
 SPEC CHECKSUMS:
   Parsimmon: ffe7bb3031e5bc3ce1cf8519e0fe544758e39a42
 
 PODFILE CHECKSUM: cae3994edccb95e446844fd2b3e17cbdbbd6b8d5
 
-COCOAPODS: 1.2.0
+COCOAPODS: 1.1.1

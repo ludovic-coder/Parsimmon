@@ -40,14 +40,14 @@ class TokenizerTests : XCTestCase {
 		let testStringOne = "I, the quick  brown fox jumped over the lazy dog..."
 
 		let tokenizer = Tokenizer();
-		let tokens = tokenizer.tokenize(text: testStringOne);
+		let tokens = tokenizer.tokenize(testStringOne);
 
 		XCTAssertEqual(tokens, expectedTokens, "Failed to tokenize words in text")
 	}
 
 	func testTokenizeAllWhitespace() {
 		let tokenizer = Tokenizer();
-		let tokens = tokenizer.tokenize(text: "               ");
+		let tokens = tokenizer.tokenize("               ");
 		XCTAssertEqual(tokens, [], "Failed to tokenize all whitespace")
 	}
 }

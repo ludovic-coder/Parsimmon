@@ -28,11 +28,11 @@ class ClassifierViewController: UIViewController {
     @IBOutlet fileprivate weak var messageTextField: UITextField!
     @IBOutlet fileprivate weak var resultLabel: UILabel!
     
-    fileprivate lazy var classifier: NaiveBayesClassifier = NaiveBayesClassifier()
+    fileprivate lazy var classifier = NaiveBayesClassifier()
 
     @IBAction fileprivate func spamOrHamAction(_ sender: UIButton) {
         guard let text = messageTextField.text else { return }
-        let category = classifier.classify(text: text)
+        let category = classifier.classify(text)
         resultLabel.text = category
     }
 
@@ -53,13 +53,13 @@ class ClassifierViewController: UIViewController {
 
     fileprivate func feedHams(_ hams: [String]) {
         for ham in hams {
-            classifier.trainWithText(text: ham, category: "ham")
+            classifier.trainWithText(ham, category: "ham")
         }
     }
 
     fileprivate func feedSpams(_ spams: [String]) {
         for spam in spams {
-            classifier.trainWithText(text: spam, category: "spam")
+            classifier.trainWithText(spam, category: "spam")
         }
     }
 }

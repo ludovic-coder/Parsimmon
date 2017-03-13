@@ -55,18 +55,22 @@ import Foundation
 
 private let smoothingParameter = 1.0
 
-public class NaiveBayesClassifier {
+open class NaiveBayesClassifier {
     public typealias Word = String
     public typealias Category = String
 
-    private let tokenizer: Tokenizer
+    fileprivate let tokenizer: Tokenizer
 
-    private var categoryOccurrences: [Category: Int] = [:]
-    private var wordOccurrences: [Word: [Category: Int]] = [:]
-    private var trainingCount = 0
-    private var wordCount = 0
+    fileprivate var categoryOccurrences: [Category: Int] = [:]
+    fileprivate var wordOccurrences: [Word: [Category: Int]] = [:]
+    fileprivate var trainingCount = 0
+    fileprivate var wordCount = 0
 
-    public init(tokenizer: Tokenizer = Tokenizer()) {
+    public init() {
+        self.tokenizer = Tokenizer()
+    }
+
+    public init(tokenizer: Tokenizer) {
         self.tokenizer = tokenizer
     }
 
@@ -78,9 +82,9 @@ public class NaiveBayesClassifier {
         @param text The text
         @param category The category of the text
     */
-    public func trainWithText(text: String, category: Category) {
-        let tokens = tokenizer.tokenize(text: text)
-        trainWithTokens(tokens: tokens, category: category)
+    open func trainWithText(_ text: String, category: Category) {
+        let tokens = tokenizer.tokenize(text)
+        trainWithTokens(tokens, category: category)
     }
 
     /**
@@ -90,12 +94,12 @@ public class NaiveBayesClassifier {
         @param tokens The tokenized text
         @param category The category of the text
     */
-    public func trainWithTokens(tokens: [Word], category: Category) {
+    open func trainWithTokens(_ tokens: [Word], category: Category) {
         let words = Set(tokens)
         for word in words {
-            incrementWord(word: word, category: category)
+            incrementWord(word, category: category)
         }
-        incrementCategory(category: category)
+        incrementCategory(category)
         trainingCount += 1
     }
 
@@ -107,9 +111,9 @@ public class NaiveBayesClassifier {
         @param text The text to classify
         @return The category classification
     */
-    public func classify(text: String) -> Category? {
-        let tokens = tokenizer.tokenize(text: text)
-        return classifyTokens(tokens: tokens)
+    open func classify(_ text: String) -> Category? {
+        let tokens = tokenizer.tokenize(text)
+        return classifyTokens(tokens)
     }
 
     /**
@@ -118,12 +122,12 @@ public class NaiveBayesClassifier {
         @param text The tokenized text to classify
         @return The category classification if one was found, or nil if one wasn’t
     */
-    public func classifyTokens(tokens: [Word]) -> Category? {
+    open func classifyTokens(_ tokens: [Word]) -> Category? {
         // Compute argmax_cat [log(P(C=cat)) + sum_token(log(P(W=token|C=cat)))]
-        return argmax(elements: categoryOccurrences.map { (category, count) -> (Category, Double) in
-            let pCategory = self.P(category: category)
+        return argmax(categoryOccurrences.map { (category, count) -> (Category, Double) in
+            let pCategory = self.P(category)
             let score = tokens.reduce(log(pCategory)) { (total, token) in
-                total + log((self.P(category: category, token) + smoothingParameter) / (pCategory + smoothingParameter + Double(self.wordCount)))
+                total + log((self.P(category, token) + smoothingParameter) / (pCategory + smoothingParameter + Double(self.wordCount)))
             }
             return (category, score)
         })
@@ -131,7 +135,7 @@ public class NaiveBayesClassifier {
 
     // MARK: - Probabilites
 
-    private func P(category: Category, _ word: Word) -> Double {
+    fileprivate func P(_ category: Category, _ word: Word) -> Double {
         if let occurrences = wordOccurrences[word] {
             let count = occurrences[category] ?? 0
             return Double(count) / Double(trainingCount)
@@ -139,13 +143,13 @@ public class NaiveBayesClassifier {
         return 0.0
     }
 
-    private func P(category: Category) -> Double {
-        return Double(totalOccurrencesOfCategory(category: category)) / Double(trainingCount)
+    fileprivate func P(_ category: Category) -> Double {
+        return Double(totalOccurrencesOfCategory(category)) / Double(trainingCount)
     }
 
     // MARK: - Counting
 
-    private func incrementWord(word: Word, category: Category) {
+    fileprivate func incrementWord(_ word: Word, category: Category) {
         if wordOccurrences[word] == nil {
             wordCount += 1
             wordOccurrences[word] = [:]
@@ -155,18 +159,18 @@ public class NaiveBayesClassifier {
         wordOccurrences[word]?[category] = count + 1
     }
 
-    private func incrementCategory(category: Category) {
-        categoryOccurrences[category] = totalOccurrencesOfCategory(category: category) + 1
+    fileprivate func incrementCategory(_ category: Category) {
+        categoryOccurrences[category] = totalOccurrencesOfCategory(category) + 1
     }
 
-    private func totalOccurrencesOfWord(word: Word) -> Int {
+    fileprivate func totalOccurrencesOfWord(_ word: Word) -> Int {
         if let occurrences = wordOccurrences[word] {
             return Array(occurrences.values).reduce(0, +)
         }
         return 0
     }
 
-    private func totalOccurrencesOfCategory(category: Category) -> Int {
+    fileprivate func totalOccurrencesOfCategory(_ category: Category) -> Int {
         return categoryOccurrences[category] ?? 0
     }
 }

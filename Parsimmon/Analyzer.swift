@@ -29,12 +29,12 @@ protocol Analyzer {
     var scheme: String { get }
 }
 
-internal func analyze(analyzer: Analyzer, text: String, options: NSLinguisticTagger.Options?) -> [Pair] {
+internal func analyze(_ analyzer: Analyzer, text: String, options: NSLinguisticTagger.Options?) -> [Pair] {
     var pairs: [Pair] = []
 
     let range = NSRange(location: 0, length: text.characters.count)
     let options = options ?? analyzer.seed.linguisticTaggerOptions
-    let tagger = analyzer.seed.linguisticTaggerWithOptions(options: options)
+    let tagger = analyzer.seed.linguisticTaggerWithOptions(options)
 
     tagger.string = text
     tagger.setOrthography(analyzer.seed.orthography, range: range)
